@@ -1,0 +1,57 @@
+import SwiftUI
+
+struct ContentView: View {
+    @State private var animationProgress: CGFloat = 0.0
+    private let resetDelay: Double = 0.5
+    private let iconOffsetMultiplier: CGFloat = 18.0
+    private let iconSpacing: CGFloat = 9.0
+    private let secondIconOffset: CGFloat = 27.0
+
+    var body: some View {
+        ZStack {
+            Button(action: {
+                guard animationProgress == 0.0 else { return }
+                startAnimation()
+            }) {
+                HStack {
+                    animatedIcon(scale: animationProgress,
+                                 offset: iconOffsetMultiplier * animationProgress + iconSpacing,
+                                 opacity: animationProgress)
+                    
+                    animatedIcon(scale: 1.0,
+                                 offset: secondIconOffset * animationProgress,
+                                 opacity: 1.0)
+                    
+                    animatedIcon(scale: 1.0 - animationProgress,
+                                 offset: iconOffsetMultiplier * animationProgress,
+                                 opacity: 1.0 - animationProgress)
+                }
+                .font(.largeTitle)
+                .foregroundColor(.blue)
+            }
+        }
+        .padding()
+    }
+
+    private func startAnimation() {
+        withAnimation(.interpolatingSpring(stiffness: 300, damping: 15)) {
+            animationProgress = 1.0
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + resetDelay) {
+            animationProgress = 0.0
+        }
+    }
+
+    private func animatedIcon(scale: CGFloat, offset: CGFloat, opacity: CGFloat) -> some View {
+        Image(systemName: "arrowtriangle.right.fill")
+            .padding(-8)
+            .scaleEffect(scale)
+            .offset(CGSize(width: offset, height: 0))
+            .opacity(opacity)
+    }
+}
+
+
+#Preview {
+    ContentView()
+}
